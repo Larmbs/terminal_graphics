@@ -1,63 +1,27 @@
-use std::io::{self, Write};
+use super::{PixelScreen, Screen};
 
-fn char_for_pixel(pixel: u8) -> char {
-    // For example, you could use a gradient from darkest to lightest character
-    match pixel {
-        0..=51 => ' ',
-        52..=102 => '.',
-        103..=153 => ':',
-        154..=204 => '-',
-        205..=255 => '#',
-    }
-}
-
-pub struct Screen {
-    height: u8,
-    width: u8,
-    pixel_grid: Vec<Vec<u8>>,
-}
-
-impl Screen {
-    pub fn new(width: u8, height: u8, color: u8) -> Self {
-        let pixel_grid = vec![vec![color; width as usize]; height as usize];
-        
-        Screen { width, height, pixel_grid: pixel_grid }
-    }
-
-    pub fn get_size(&self) -> (u8, u8) {
-        (self.width, self.height)
-    }
-
-    pub fn set_pixel(&mut self, x: usize, y: usize, color: u8) {
-        if let Some(row) = self.pixel_grid.get_mut(y as usize) {
-            if let Some(pixel) = row.get_mut(x as usize) {
-                *pixel = color;
-            }
-        }   
-    }
-
-    pub fn clear_screen() {
-        print!("\x1B[2J");
-        io::stdout().flush().expect("Failed to flush stdout");
-    }
-
-    pub fn fill(&mut self, color: u8) {
-        self.pixel_grid = vec![vec![color; self.width as usize]; self.height as usize];
-    }
-
-    pub fn display(&self) {
-        Screen::clear_screen();
-        for row in &*self.pixel_grid {
-            for &pixel in row {
-                print!("{} ", char_for_pixel(pixel));
-            }
-            println!(); // Move to the next line after printing a row
-        }
-    }
-}
 
 pub struct Canvas {
     screen: Screen,
+}
+
+/// Forwarding PixelScreens
+impl PixelScreen for Canvas {
+    fn get_size(&self) -> (u8, u8) {
+        self.screen.get_size()
+    }
+
+    fn set_pixel(&mut self, x: usize, y: usize, color: u8) {
+        self.screen.set_pixel(x, y, color);
+    }
+
+    fn fill(&mut self, color: u8) {
+        self.screen.fill(color);
+    }
+
+    fn display(&self) {
+        self.screen.display();
+    }
 }
 
 impl Canvas {
@@ -66,19 +30,11 @@ impl Canvas {
         Canvas { screen }
     }
 
-    pub fn get_size(&self) -> (u8, u8) {
-        self.screen.get_size()
-    }
-
-    pub fn display(&self) {
-        self.screen.display();
-    }
-
     pub fn draw_line(&mut self, x1: usize, y1: usize, x2: usize, y2: usize, color: u8) {
         let mut x1 = x1 as isize;
         let mut y1 = y1 as isize;
-        let mut x2 = x2 as isize;
-        let mut y2 = y2 as isize;
+        let x2 = x2 as isize;
+        let y2 = y2 as isize;
 
         let dx = (x2 - x1).abs();
         let dy = -(y2 - y1).abs();
