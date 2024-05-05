@@ -19,7 +19,7 @@ fn set_cursor_to_start() -> io::Result<()> {
     Ok(())
 }
 
-pub fn init() {
+pub fn init_display() {
     clear_screen().unwrap();
 }
 

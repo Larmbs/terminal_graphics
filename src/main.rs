@@ -1,14 +1,13 @@
 use terminal_graphics::{
-    init,
+    init_display,
     Canvas,
     PixelScreen,
     Clock,
+    Duration,
 };
 
-use std::time::Duration;
-
 fn main() {
-    init();
+    init_display();
     let mut screen = Canvas::new(40, 30, 250);
    
     let mut x = 0;
@@ -22,7 +21,7 @@ fn main() {
         x %= 41;
 
         screen.draw_line(x, 30, 0, 0, 0);
-        screen.draw_circle(x/2, 15, 7, 60);
+        screen.draw_circle(x/2 as usize, 15, 7, 60);
 
         screen.display();
 
