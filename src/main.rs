@@ -1,25 +1,31 @@
-use screen::PixelScreen;
-use std::thread;
+use terminal_graphics::{
+    init,
+    Canvas,
+    PixelScreen,
+    Clock,
+};
+
 use std::time::Duration;
-mod screen;
 
 fn main() {
-    screen::init();
-    let mut screen = screen::Canvas::new(40, 30, 250);
-    screen.draw_line(0, 0, 50, 20, 0);
-    screen.draw_circle(10, 10, 10, 100);
-    screen.display();
+    init();
+    let mut screen = Canvas::new(40, 30, 250);
+   
     let mut x = 0;
+
+    let mut clock = Clock::new();
 
     loop {
         screen.fill(250);
-        x += 2;
+        x += 1;
 
         x %= 41;
 
         screen.draw_line(x, 30, 0, 0, 0);
         screen.draw_circle(x/2, 15, 7, 60);
+
         screen.display();
-        thread::sleep(Duration::from_millis(30));
+
+        clock.tick(Duration::from_millis(17))
     }
 }

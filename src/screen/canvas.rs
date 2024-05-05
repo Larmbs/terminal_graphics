@@ -23,13 +23,15 @@ impl PixelScreen for Canvas {
         self.screen.display();
     }
 }
-
 impl Canvas {
     pub fn new(width: u8, height: u8, color: u8) -> Self {
         let screen = Screen::new(width, height, color);
         Canvas { screen }
     }
+}
 
+#[allow(unused)]
+impl Canvas {
     pub fn draw_line(&mut self, x1: usize, y1: usize, x2: usize, y2: usize, color: u8) {
         let mut x1 = x1 as isize;
         let mut y1 = y1 as isize;
@@ -84,6 +86,29 @@ impl Canvas {
                 x0 -= 1;
                 err += 1 - 2 * x0;
             }
+        }
+    }
+
+    pub fn draw_rect(&mut self, x1: usize, y1: usize, x2: usize, y2: usize, color: u8) {
+        // Draw top and bottom edges
+        self.draw_line(x1, y1, x2, y1, color);
+        self.draw_line(x1, y2, x2, y2, color);
+    
+        // Draw left and right edges
+        self.draw_line(x1, y1, x1, y2, color);
+        self.draw_line(x2, y1, x2, y2, color);
+    }
+
+    pub fn draw_rect_filled(&mut self, x1: usize, y1: usize, x2: usize, y2: usize, color: u8) {
+        // Calculate the top-left and bottom-right corners of the rectangle
+        let x_min = x1.min(x2);
+        let y_min = y1.min(y2);
+        let x_max = x1.max(x2);
+        let y_max = y1.max(y2);
+    
+        // Iterate over each row of the rectangle and draw a horizontal line
+        for y in y_min..=y_max {
+            self.draw_line(x_min, y, x_max, y, color);
         }
     }
 }
